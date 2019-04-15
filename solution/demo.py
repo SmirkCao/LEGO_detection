@@ -37,6 +37,7 @@ class SegAdaThreshDemo(Demo):
         while True:
             _, frame = self.cap.read()
             rst, objs = seg.run(frame)
+            # print(objs)
             cv.imshow("SegAdaThreshDemo", rst)
             k = cv.waitKey(100)
             if k == ord("q"):
