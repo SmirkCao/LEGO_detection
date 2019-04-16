@@ -120,38 +120,22 @@ class AreaDemo(Demo):
         cv.destroyAllWindows()
         
 
+format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(level=logging.INFO, format=format_str)
+logger = logging.getLogger(__name__)
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-t", "--type", required=False, help="type of demo")
+ap.add_argument("-c", "--camera_id", required=False, help="camera id")
+args = vars(ap.parse_args())
+
+demo_map = {"feas": CircleFeatureDemo,
+            "seg_ada": SegAdaThreshDemo,
+            "color": ColorDemo,
+            "perimeter": PerimeterDemo,
+            "area": AreaDemo}
+
 if __name__ == '__main__':
-    format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=format_str)
-    logger = logging.getLogger(__name__)
-
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-t", "--type", required=False, help="type of demo")
-    ap.add_argument("-c", "--camera_id", required=False, help="camera id")
-    args = vars(ap.parse_args())
-
-    demo_map = {"feas": CircleFeatureDemo,
-                "seg_ada": SegAdaThreshDemo,
-                "color": ColorDemo,
-                "perimeter": PerimeterDemo,
-                "area": AreaDemo}
-    
     demo = demo_map[args["type"]](n_camera=int(args["camera_id"]))
     demo.show()
-    
 
-else:
-    format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=format_str)
-    logger = logging.getLogger(__name__)
-
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-t", "--type", required=False, help="type of demo")
-    ap.add_argument("-c", "--camera_id", required=False, help="camera id")
-    args = vars(ap.parse_args())
-
-    demo_map = {"feas": CircleFeatureDemo,
-                "seg_ada": SegAdaThreshDemo}
-
-    demo = demo_map[args["type"]](n_camera=int(args["camera_id"]))
-    demo.show()
