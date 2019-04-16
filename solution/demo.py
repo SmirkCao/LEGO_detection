@@ -12,7 +12,7 @@ TODO: save to video
 TODO: get data from path
 """
 from segmentation import SegAdaThresh
-from feas import FeaColor
+from feas import FeaColor, FeaPerimeter, FeaArea
 import cv2 as cv
 import logging
 import argparse
@@ -68,8 +68,58 @@ class ColorDemo(Demo):
             if k == ord("q"):
                 break
         cv.destroyAllWindows()
+
+
+class PerimeterDemo(Demo):
+    def show(self):
+        seg = SegAdaThresh()
+        fea = FeaPerimeter()
+        while True:
+            _, frame = self.cap.read()
+            rst, objs = seg.run(frame.copy())
+            perimeters = []
+            if "contours" in objs.keys():
+                contours = objs["contours"]
+                for idx, contour in enumerate(contours):
+                    perimeter = fea.extract(frame, contour)
+                    perimeters.append(perimeter)
+                    x, y = tuple(contour[0, 0])
+                    cv.putText(rst, "Perimeter:#{0}:{1:.1f}".format(idx, perimeter),
+                               (x + int(frame.shape[0] / 2), y + 20),
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+    
+            cv.imshow("PerimeterDemo", rst)
+            k = cv.waitKey(100)
+            if k == ord("q"):
+                break
+        cv.destroyAllWindows()
+
+
+class AreaDemo(Demo):
+    def show(self):
+        seg = SegAdaThresh()
+        fea = FeaArea()
+        while True:
+            _, frame = self.cap.read()
+            rst, objs = seg.run(frame.copy())
+            areas = []
+            if "contours" in objs.keys():
+                contours = objs["contours"]
+                for idx, contour in enumerate(contours):
+                    area = fea.extract(frame, contour)
+                    areas.append(area)
+                    x, y = tuple(contour[0, 0])
+                    cv.putText(rst, "Area:#{0}:{1:.1f}".format(idx, area),
+                               (x + int(frame.shape[0] / 2), y + 20),
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+            
+            cv.imshow("AreaDemo", rst)
+            k = cv.waitKey(100)
+            if k == ord("q"):
+                break
+        cv.destroyAllWindows()
         
-        
+
 if __name__ == '__main__':
     format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=format_str)
@@ -82,7 +132,9 @@ if __name__ == '__main__':
 
     demo_map = {"feas": CircleFeatureDemo,
                 "seg_ada": SegAdaThreshDemo,
-                "color": ColorDemo}
+                "color": ColorDemo,
+                "perimeter": PerimeterDemo,
+                "area": AreaDemo}
     
     demo = demo_map[args["type"]](n_camera=int(args["camera_id"]))
     demo.show()
