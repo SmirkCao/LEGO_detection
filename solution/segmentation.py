@@ -19,6 +19,9 @@ class Segmenter(object):
     
     
 class SegAdaThresh(Segmenter):
+    """
+    area and perimeter for filter contour
+    """
     def run(self, img):
         adaptive_method = 0
         threshold_type = 1
@@ -37,14 +40,17 @@ class SegAdaThresh(Segmenter):
         if len(contours) > 0:
             areas = []
             perimeters = []
-            for idx, contour in enumerate(contours):
+            contours_filtered = []
+            idx = 0
+            for contour in contours:
                 area = cv.contourArea(contour)
                 perimeter = cv.arcLength(contour, True)
                 if area > self.min_area and perimeter > self.min_perimeter:
                     areas.append(area)
                     perimeters.append(perimeter)
+                    contours_filtered.append(contour)
                     # tag on img
-                    cv.drawContours(img, contour, -1, (0, 0, 255), 3)
+                    cv.drawContours(img, contour, -1, (0, 0, 255), 3, cv.LINE_AA)
                     cv.putText(img, "#{}".format(idx), tuple(contour[0, 0]),
                                cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
                     
@@ -53,10 +59,11 @@ class SegAdaThresh(Segmenter):
                                cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
                     cv.putText(img_info, "Area:#{0}:{1:.1f}".format(idx, area), (10, 40 + idx * 40),
                                cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                    idx += 1
 
             rst["areas"] = areas
             rst["perimeters"] = perimeters
-            rst["contours"] = contours
+            rst["contours"] = contours_filtered
 
             img_rst = np.concatenate([img_info, img], axis=1)
         return img_rst, rst

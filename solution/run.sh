@@ -35,4 +35,7 @@ echo "test data: input/test/0/*.jpg"
 #python classification.py -i ${test_fea} -m ${model} -l ${label}
 
 ## demo
+### segmentation
 python solution/demo.py -t seg_ada -c 1
+### color
+python solution/demo.py -t color -c 1

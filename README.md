@@ -12,6 +12,12 @@ Just another LEGO detection, but it's fun.
 python solution/demo.py -t seg_ada -c 1
 ```
 
+### Color Feature
+
+```bash
+python solution/demo.py -t color -c 1
+```
+
 ### Feature Engineering
 
 ```bash

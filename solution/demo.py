@@ -12,6 +12,7 @@ TODO: save to video
 TODO: get data from path
 """
 from segmentation import SegAdaThresh
+from feas import FeaColor
 import cv2 as cv
 import logging
 import argparse
@@ -43,8 +44,32 @@ class SegAdaThreshDemo(Demo):
             if k == ord("q"):
                 break
         cv.destroyAllWindows()
+      
         
-
+class ColorDemo(Demo):
+    def show(self):
+        seg = SegAdaThresh()
+        fea = FeaColor()
+        while True:
+            _, frame = self.cap.read()
+            rst, objs = seg.run(frame.copy())
+            colors = []
+            if "contours" in objs.keys():
+                contours = objs["contours"]
+                for idx, contour in enumerate(contours):
+                    color = fea.extract(frame, contour)
+                    colors.append(color)
+                    x, y = tuple(contour[0, 0])
+                    cv.putText(rst, "#{0}:{1}".format(idx, color), (x+int(frame.shape[0]/2), y+20),
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+            
+            cv.imshow("ColorDemo", rst)
+            k = cv.waitKey(100)
+            if k == ord("q"):
+                break
+        cv.destroyAllWindows()
+        
+        
 if __name__ == '__main__':
     format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=format_str)
@@ -56,7 +81,8 @@ if __name__ == '__main__':
     args = vars(ap.parse_args())
 
     demo_map = {"feas": CircleFeatureDemo,
-                "seg_ada": SegAdaThreshDemo}
+                "seg_ada": SegAdaThreshDemo,
+                "color": ColorDemo}
     
     demo = demo_map[args["type"]](n_camera=int(args["camera_id"]))
     demo.show()
