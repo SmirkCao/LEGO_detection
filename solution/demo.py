@@ -154,6 +154,9 @@ class ClassificationDemo(Demo):
         return y
     
     def show(self):
+        with open("label.pickle", "rb") as f:
+            labels = pickle.load(f)
+        
         seg = SegAdaThresh(min_area=1000, min_perimeter=100)
         fe = FeatureExtractor()
         fe.add(FeaPerimeter())
@@ -174,9 +177,11 @@ class ClassificationDemo(Demo):
                     cv.putText(rst, str(y),
                                (pos_x+int(frame.shape[1]/2)-50, pos_y+20),
                                cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                    
+                    rst[200+40*idx:200+40*(idx+1), 40:40+40] = labels[y[0]]
     
             cv.imshow("Classification Demo", rst)
-            k = cv.waitKey(100)
+            k = cv.waitKey(10)
             if k == ord("q"):
                 break
         cv.destroyAllWindows()
