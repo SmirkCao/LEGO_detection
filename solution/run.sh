@@ -5,27 +5,26 @@
 
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 
-echo "train data: input/train/label/*.jpg"
-echo "test data: input/test/0/*.jpg"
+echo "train data: input/train/*.png"
+echo "test data: input/test/*.png"
 
-## 0. folders preparation
-## 0.1 input
-#train="input/train"
-#test="input/test/0"
-#label="input/dataset.desc"
-## 0.2 output
-#output_folder="output/"$(date "+%Y%m%d%H%M%S")
-#train_fea=${output_folder}"/train_fea"
-#test_fea=${output_folder}"/test_fea"
-#model=${output_folder}"/model"
-#detect=${output_folder}"/detect"
-## 0.3 mkdir
-#mkdir -p {${output_folder},${train_fea},${model},${detect},${test_fea}}
-#
-## 1. feature extraction
-#python feas.py -i ${train} -o ${train_fea}
+# 0. folders preparation
+# 0.1 input
+train="input/train"
+test="input/test"
+# 0.2 output
+output_folder="output/"$(date "+%Y%m%d%H%M%S")
+train_fea=${output_folder}"/train_fea"
+test_fea=${output_folder}"/test_fea"
+model=${output_folder}"/model"
+detect=${output_folder}"/detect"
+# 0.3 mkdir
+mkdir -p {${output_folder},${train_fea},${model},${detect},${test_fea}}
+
+# 1. feature extraction
+python feas.py -i ${train} -o ${train_fea}
 ## 2. gscv train
-#python model.py -i ${train_fea} -o ${model}
+python model.py -i ${train_fea} -o ${model}
 ## 3. classification
 ## 3.1 detection
 #python detect.py -i ${test} -o ${detect}
@@ -35,14 +34,14 @@ echo "test data: input/test/0/*.jpg"
 #python classification.py -i ${test_fea} -m ${model} -l ${label}
 
 ## demo
-## -c for camera id
-### segmentation
-python solution/demo.py -t seg_ada -c 1
-### color
-python solution/demo.py -t color -c 1
-### perimeter
-python solution/demo.py -t perimeter -c 1
-### area
-python solution/demo.py -t area -c 1
-### min area rect
-python solution/demo.py -t min_area -c 1
+### -c for camera id
+#### segmentation
+#python solution/demo.py -t seg_ada -c 1
+#### color
+#python solution/demo.py -t color -c 1
+#### perimeter
+#python solution/demo.py -t perimeter -c 1
+#### area
+#python solution/demo.py -t area -c 1
+#### min area rect
+#python solution/demo.py -t min_area -c 1
