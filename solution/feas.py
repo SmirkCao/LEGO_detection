@@ -4,13 +4,22 @@
 # Filename: feas
 # Date: 4/15/19
 # Author: 😏 <smirk dot cao at gmail dot com>
+from segmentation import SegAdaThresh
 import cv2 as cv
 import numpy as np
+import warnings
+import logging
+import argparse
+import os
 
 
 class Feature(object):
     def extract(self, img, mask=None):
         raise NotImplementedError
+    
+    def get_feature(self, img, mask=None):
+        logger.info("Not Implemented Error")
+        return None
 
 
 class FeaCircle(Feature):
@@ -60,6 +69,13 @@ class FeaColor(Feature):
         # np.save("color.npy", hist)
         idx = int(np.argmin(rst))
         return self.color_map[idx]
+    
+    def get_feature(self, img, mask=None):
+        color = self.extract(img, mask=mask)
+        for idx in range(7):
+            if self.color_map[idx] == color:
+                break
+        return np.array([[idx]])
 
 
 class FeaPerimeter(Feature):
@@ -68,6 +84,10 @@ class FeaPerimeter(Feature):
         perimeter = cv.arcLength(contour, True)
         return perimeter
     
+    def get_feature(self, img, mask=None):
+        perimeter = self.extract(img, mask=mask)
+        return np.array([[perimeter]])
+    
 
 class FeaArea(Feature):
     def extract(self, img, mask=None):
@@ -75,6 +95,10 @@ class FeaArea(Feature):
         area = cv.contourArea(contour)
         return area
     
+    def get_feature(self, img, mask=None):
+        area = self.extract(img, mask=mask)
+        return np.array([[area]])
+
 
 class FeaMinAreaRect(Feature):
     """
@@ -87,8 +111,124 @@ class FeaMinAreaRect(Feature):
         x, y = rst[0]
         w, h = rst[1]
         return (x, y), w*h
-
+    
+    def get_feature(self, img, mask=None):
+        _, min_area = self.extract(img, mask=mask)
+        return np.array([[min_area]])
+    
 
 class FeaHuMoments(Feature):
     def extract(self, img, mask=None):
         pass
+
+
+class FeatureExtractor(object):
+    """
+    file structure:
+    train: input_path/filename
+    test: input_path/filename
+    """
+    
+    def __init__(self, input_path, output_path, verbose=True):
+        self.input_path = input_path
+        self.output_path = output_path
+        self.files = []
+        self.verbose = verbose
+        self.feas = None
+        self.seg = SegAdaThresh(min_area=1000, min_perimeter=100)
+
+    def load_images(self):
+        # file path
+        self.files = []
+        for root, dirs, files in os.walk(self.input_path):
+            for file in files:
+                if file.__contains__(".png"):
+                    self.files.append(root + "/" + file)
+        if self.verbose:
+            logger.info(self.files)
+        return self.files
+    
+    def process(self):
+        labels = []
+        x = []
+        for file in self.files:
+            features = None
+            img = cv.imread(file)
+            rst, objs = self.seg.run(img.copy())
+            if "contours" in objs.keys():
+                contours = objs["contours"]
+                if len(contours) > 0:
+                    contour = contours[0]
+                    file = file.replace(self.input_path, self.output_path)
+                    
+                    # get features
+                    for fea in self.feas:
+                        if features is None:
+                            features = fea.get_feature(img, contour)
+                        else:
+                            features = np.concatenate([features, fea.get_feature(img, contour)], axis=1)
+                    x.append(features)
+                    # get labels
+                    logger.info(file)
+                    labels.append(file.split("/")[-1].split("_")[0])
+                else:
+                    logger.info(file+" feature extraction failed.")
+                    # x.append(x[-1])
+                
+        # logger.info("images count: {0}".format(len(labels)))
+        # add label
+        x = np.array(x)
+        x = np.concatenate([np.array(x).reshape(len(labels), -1), np.array(labels).reshape(-1, 1)], axis=1)
+        print("x shape, labels shape", x.shape, np.array(labels).shape)
+        
+        if self.verbose:
+            logger.info("x shape: {0}".format(x.shape))
+        # output
+        fpath = os.path.join(self.output_path, "fea.npy")
+        if self.verbose:
+            logger.info("output feature files {0}.".format(self.output_path))
+        np.save(fpath, x)
+    
+    def summary(self):
+        pass
+    
+    def add(self, feature):
+        # assert feature
+        if self.feas is None:
+            self.feas = [feature]
+        else:
+            self.feas.append(feature)
+            print("new feature")
+            
+
+warnings.simplefilter("ignore")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-p", "--path", required=False, help="path to input data file")
+    ap.add_argument("-i", "--input_path", required=False, help="path to input data file")
+    ap.add_argument("-o", "--output_path", required=False, help="path to input data file")
+    args = vars(ap.parse_args())
+    
+    logger.info("input path:" + args["input_path"])
+    
+    if args["input_path"] is None:
+        input_path = "dataset"
+    else:
+        input_path = args["input_path"]
+    
+    if args["output_path"] is None:
+        output_path = "feas"
+    else:
+        output_path = args["output_path"]
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    fe = FeatureExtractor(input_path, output_path)
+    fe.add(FeaPerimeter())
+    fe.add(FeaArea())
+    fe.add(FeaMinAreaRect())
+    fe.load_images()
+    fe.process()
