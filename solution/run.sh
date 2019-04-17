@@ -26,12 +26,10 @@ python feas.py -i ${train} -o ${train_fea}
 ## 2. gscv train
 python model.py -i ${train_fea} -o ${model}
 ## 3. classification
-## 3.1 detection
-#python detect.py -i ${test} -o ${detect}
-## 3.2 feature extraction
-#python feas.py -i ${detect} -o ${test_fea}
+## 3.1 feature extraction
+python feas.py -i ${test} -o ${test_fea}
 ## 3.3 predict
-#python classification.py -i ${test_fea} -m ${model} -l ${label}
+python classification.py -i ${test_fea} -m ${model}"/model.pickle"
 
 ## demo
 ### -c for camera id

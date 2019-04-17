@@ -12,10 +12,12 @@ TODO: save to video
 TODO: get data from path
 """
 from segmentation import SegAdaThresh
-from feas import FeaColor, FeaPerimeter, FeaArea, FeaMinAreaRect
+from feas import FeaColor, FeaPerimeter, FeaArea, FeaMinAreaRect, FeatureExtractor
+from model import RF
 import cv2 as cv
 import logging
 import argparse
+import pickle
 
 
 class Demo(object):
@@ -146,6 +148,40 @@ class MinAreaRectDemo(Demo):
         cv.destroyAllWindows()
 
 
+class ClassificationDemo(Demo):
+    def predict(self):
+        print(self.model)
+        return y
+    
+    def show(self):
+        seg = SegAdaThresh(min_area=1000, min_perimeter=100)
+        fe = FeatureExtractor()
+        fe.add(FeaPerimeter())
+        fe.add(FeaArea())
+        fe.add(FeaMinAreaRect())
+        with open("model.pickle", "rb") as f:
+            model = pickle.load(f)
+        while True:
+            _, frame = self.cap.read()
+            rst, objs = seg.run(frame.copy())
+            areas = []
+            if "contours" in objs.keys():
+                contours = objs["contours"]
+                for idx, contour in enumerate(contours):
+                    feas = fe.do(frame, contour)
+                    y = model.predict(feas)
+                    pos_x, pos_y = tuple(contour[0, 0])
+                    cv.putText(rst, str(y),
+                               (pos_x+int(frame.shape[1]/2)-50, pos_y+20),
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+    
+            cv.imshow("Classification Demo", rst)
+            k = cv.waitKey(100)
+            if k == ord("q"):
+                break
+        cv.destroyAllWindows()
+        
+
 format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(level=logging.INFO, format=format_str)
 logger = logging.getLogger(__name__)
@@ -160,7 +196,8 @@ demo_map = {"feas": CircleFeatureDemo,
             "color": ColorDemo,
             "perimeter": PerimeterDemo,
             "area": AreaDemo,
-            "min_area": MinAreaRectDemo}
+            "min_area": MinAreaRectDemo,
+            "clf": ClassificationDemo}
 
 if __name__ == '__main__':
     demo = demo_map[args["type"]](n_camera=int(args["camera_id"]))

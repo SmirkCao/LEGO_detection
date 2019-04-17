@@ -125,11 +125,11 @@ class FeaHuMoments(Feature):
 class FeatureExtractor(object):
     """
     file structure:
-    train: input_path/filename
-    test: input_path/filename
+    train: input_path/train/filename
+    test: input_path/test/filename
     """
     
-    def __init__(self, input_path, output_path, verbose=True):
+    def __init__(self, input_path=None, output_path=None, verbose=True):
         self.input_path = input_path
         self.output_path = output_path
         self.files = []
@@ -189,6 +189,20 @@ class FeatureExtractor(object):
             logger.info("output feature files {0}.".format(self.output_path))
         np.save(fpath, x)
     
+    def do(self, image, mask=None):
+        x = []
+        contour = mask
+        features = None
+        for fea in self.feas:
+            if features is None:
+                features = fea.get_feature(image, contour)
+            else:
+                features = np.concatenate([features, fea.get_feature(image, contour)], axis=1)
+        x.append(features)
+        x = np.array(x).reshape(1, -1)
+        logger.info(x.shape)
+        return x
+        
     def summary(self):
         pass
     
