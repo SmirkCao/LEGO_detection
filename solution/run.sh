@@ -35,7 +35,14 @@ echo "test data: input/test/0/*.jpg"
 #python classification.py -i ${test_fea} -m ${model} -l ${label}
 
 ## demo
+## -c for camera id
 ### segmentation
 python solution/demo.py -t seg_ada -c 1
 ### color
 python solution/demo.py -t color -c 1
+### perimeter
+python solution/demo.py -t perimeter -c 1
+### area
+python solution/demo.py -t area -c 1
+### min area rect
+python solution/demo.py -t min_area -c 1

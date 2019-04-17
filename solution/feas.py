@@ -36,7 +36,7 @@ class FeaColor(Feature):
     def __init__(self):
         self.color_map = {0: "yellow", 1: "green", 2: "blue",
                           3: "red", 4: "white", 5: "orange",
-                          6: "DarkGray"}
+                          6: "darkgray"}
         self.color_table = []
         for idx in range(7):
             self.color_table.append(np.load("color_table/"+self.color_map[idx]+".npy"))
@@ -77,9 +77,16 @@ class FeaArea(Feature):
     
 
 class FeaMinAreaRect(Feature):
+    """
+    return centorid and area
+    centroid for grab application
+    """
     def extract(self, img, mask=None):
         contour = mask
-        pass
+        rst = cv.minAreaRect(contour)
+        x, y = rst[0]
+        w, h = rst[1]
+        return (x, y), w*h
 
 
 class FeaHuMoments(Feature):
