@@ -6,6 +6,7 @@
 # Author: 😏 <smirk dot cao at gmail dot com>
 # Extract features from dataset to feas folder.
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import cross_val_score
 import numpy as np
 import argparse
@@ -70,6 +71,25 @@ class RF(Model):
             x = self.x
         
         y = self.clf.predict(x)
+        return y
+
+
+class KNN(Model):
+    def __init__(self, input_path, output_path):
+        super().__init__(input_path, output_path)
+        self.clf = NearestNeighbors(n_neighbors=3, algorithm='ball_tree')
+    
+    def fit(self):
+        print(self.x.shape)
+        print(self.y.shape, self.y)
+        self.clf = self.clf.fit(self.x)
+
+    def predict(self, x=None):
+        if x is None:
+            x = self.x
+        
+        y = self.clf.kneighbors(x)
+        print(y)
         return y
 
 

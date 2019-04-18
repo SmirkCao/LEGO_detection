@@ -63,7 +63,7 @@ class ColorDemo(Demo):
                     colors.append(color)
                     x, y = tuple(contour[0, 0])
                     cv.putText(rst, "#{0}:{1}".format(idx, color), (x+int(frame.shape[0]/2), y+20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
             
             cv.imshow("ColorDemo", rst)
             k = cv.waitKey(100)
@@ -88,7 +88,7 @@ class PerimeterDemo(Demo):
                     x, y = tuple(contour[0, 0])
                     cv.putText(rst, "Perimeter:#{0}:{1:.1f}".format(idx, perimeter),
                                (x + int(frame.shape[0] / 2), y + 20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
     
             cv.imshow("PerimeterDemo", rst)
             k = cv.waitKey(100)
@@ -113,7 +113,7 @@ class AreaDemo(Demo):
                     x, y = tuple(contour[0, 0])
                     cv.putText(rst, "Area:#{0}:{1:.1f}".format(idx, area),
                                (x + int(frame.shape[0] / 2), y + 20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
             
             cv.imshow("AreaDemo", rst)
             k = cv.waitKey(100)
@@ -139,7 +139,7 @@ class MinAreaRectDemo(Demo):
                     cv.circle(rst, (x+int(frame.shape[1]/2), y), 5, (255, 0, 0), 3, cv.LINE_AA)
                     cv.putText(rst, "minArea:#{0}:{1:.1f}".format(idx, area),
                                (x + int(frame.shape[0] / 2), y + 20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
             
             cv.imshow("MinAreaRectDemo", rst)
             k = cv.waitKey(100)
@@ -176,7 +176,7 @@ class ClassificationDemo(Demo):
                     pos_x, pos_y = tuple(contour[0, 0])
                     cv.putText(rst, str(y),
                                (pos_x+int(frame.shape[1]/2)-50, pos_y+20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
                     
                     rst[200+40*idx:200+40*(idx+1), 40:40+40] = labels[y[0]]
     

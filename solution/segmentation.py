@@ -52,7 +52,7 @@ class SegAdaThresh(Segmenter):
                     # tag on img
                     cv.drawContours(img, contour, -1, (0, 0, 255), 3, cv.LINE_AA)
                     cv.putText(img, "#{}".format(idx), tuple(contour[0, 0]),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (51, 204, 153))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
                     
                     # tag on img_info
                     cv.putText(img_info, "Perimeter:#{0}:{1:.1f}".format(idx, perimeter), (10, 20+idx*40),
