@@ -44,4 +44,6 @@ echo "test data: input/test/*.png"
 #### min area rect
 #python solution/demo.py -t min_area -c 1
 ## good features
-python solution/demo.py -t good_feas -c 1
+#python solution/demo.py -t good_feas -c 1
+## clf demo
+python solution/demo.py -t clf -c 1

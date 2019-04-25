@@ -259,5 +259,6 @@ if __name__ == '__main__':
     fe.add(FeaPerimeter())
     fe.add(FeaArea())
     fe.add(FeaMinAreaRect())
+    fe.add(FeaGoodFeatures())
     fe.load_images()
     fe.process()

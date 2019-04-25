@@ -150,45 +150,6 @@ class MinAreaRectDemo(Demo):
         cv.destroyAllWindows()
 
 
-class ClassificationDemo(Demo):
-    def predict(self):
-        print(self.model)
-        return y
-    
-    def show(self):
-        with open("label.pickle", "rb") as f:
-            labels = pickle.load(f)
-        
-        seg = SegAdaThresh(min_area=1000, min_perimeter=100)
-        fe = FeatureExtractor()
-        fe.add(FeaPerimeter())
-        fe.add(FeaArea())
-        fe.add(FeaMinAreaRect())
-        with open("model.pickle", "rb") as f:
-            model = pickle.load(f)
-        while True:
-            _, frame = self.cap.read()
-            rst, objs = seg.run(frame.copy())
-            areas = []
-            if "contours" in objs.keys():
-                contours = objs["contours"]
-                for idx, contour in enumerate(contours):
-                    feas = fe.do(frame, contour)
-                    y = model.predict(feas)
-                    pos_x, pos_y = tuple(contour[0, 0])
-                    cv.putText(rst, str(y),
-                               (pos_x+int(frame.shape[1]/2)-50, pos_y+20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
-                    
-                    rst[200+40*idx:200+40*(idx+1), 40:40+40] = labels[y[0]]
-    
-            cv.imshow("Classification Demo", rst)
-            k = cv.waitKey(10)
-            if k == ord("q"):
-                break
-        cv.destroyAllWindows()
-
-
 class GoodFeaturesDemo(Demo):
     def show(self):
         seg = SegAdaThresh()
@@ -212,6 +173,46 @@ class GoodFeaturesDemo(Demo):
             
             cv.imshow("GoodFeatureToTrackDemo", frame)
             k = cv.waitKey(100)
+            if k == ord("q"):
+                break
+        cv.destroyAllWindows()
+
+
+class ClassificationDemo(Demo):
+    def predict(self):
+        print(self.model)
+        return y
+    
+    def show(self):
+        with open("label.pickle", "rb") as f:
+            labels = pickle.load(f)
+        
+        seg = SegAdaThresh(min_area=1000, min_perimeter=100)
+        fe = FeatureExtractor()
+        fe.add(FeaPerimeter())
+        fe.add(FeaArea())
+        fe.add(FeaMinAreaRect())
+        fe.add(FeaGoodFeatures())
+        with open("model.pickle", "rb") as f:
+            model = pickle.load(f)
+        while True:
+            _, frame = self.cap.read()
+            rst, objs = seg.run(frame.copy())
+            areas = []
+            if "contours" in objs.keys():
+                contours = objs["contours"]
+                for idx, contour in enumerate(contours):
+                    feas = fe.do(frame, contour)
+                    y = model.predict(feas)
+                    pos_x, pos_y = tuple(contour[0, 0])
+                    cv.putText(rst, str(y),
+                               (pos_x+int(frame.shape[1]/2)-50, pos_y+20),
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
+                    
+                    rst[200+40*idx:200+40*(idx+1), 40:40+40] = labels[y[0]]
+    
+            cv.imshow("Classification Demo", rst)
+            k = cv.waitKey(10)
             if k == ord("q"):
                 break
         cv.destroyAllWindows()
