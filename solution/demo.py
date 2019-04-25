@@ -9,7 +9,6 @@
 Raises:
     NotImplementedError -- if sub class not implemented show method
 TODO: save to video
-TODO: get data from path
 """
 from segmentation import SegAdaThresh
 from feas import FeaColor, FeaPerimeter, FeaArea, FeaMinAreaRect, FeatureExtractor
@@ -18,6 +17,8 @@ import cv2 as cv
 import logging
 import argparse
 import pickle
+
+COMMENT_COLOR = (255, 0, 0)
 
 
 class Demo(object):
@@ -63,7 +64,7 @@ class ColorDemo(Demo):
                     colors.append(color)
                     x, y = tuple(contour[0, 0])
                     cv.putText(rst, "#{0}:{1}".format(idx, color), (x+int(frame.shape[0]/2), y+20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
             
             cv.imshow("ColorDemo", rst)
             k = cv.waitKey(100)
@@ -88,7 +89,7 @@ class PerimeterDemo(Demo):
                     x, y = tuple(contour[0, 0])
                     cv.putText(rst, "Perimeter:#{0}:{1:.1f}".format(idx, perimeter),
                                (x + int(frame.shape[0] / 2), y + 20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
     
             cv.imshow("PerimeterDemo", rst)
             k = cv.waitKey(100)
@@ -113,7 +114,7 @@ class AreaDemo(Demo):
                     x, y = tuple(contour[0, 0])
                     cv.putText(rst, "Area:#{0}:{1:.1f}".format(idx, area),
                                (x + int(frame.shape[0] / 2), y + 20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
             
             cv.imshow("AreaDemo", rst)
             k = cv.waitKey(100)
@@ -136,10 +137,10 @@ class MinAreaRectDemo(Demo):
                     (x, y), area = fea.extract(frame, contour)
                     x, y = int(x), int(y)
                     areas.append(area)
-                    cv.circle(rst, (x+int(frame.shape[1]/2), y), 5, (255, 0, 0), 3, cv.LINE_AA)
+                    cv.circle(rst, (x+int(frame.shape[1]/2), y), 5, COMMENT_COLOR, 3, cv.LINE_AA)
                     cv.putText(rst, "minArea:#{0}:{1:.1f}".format(idx, area),
                                (x + int(frame.shape[0] / 2), y + 20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
             
             cv.imshow("MinAreaRectDemo", rst)
             k = cv.waitKey(100)
@@ -176,7 +177,7 @@ class ClassificationDemo(Demo):
                     pos_x, pos_y = tuple(contour[0, 0])
                     cv.putText(rst, str(y),
                                (pos_x+int(frame.shape[1]/2)-50, pos_y+20),
-                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 0, 0))
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
                     
                     rst[200+40*idx:200+40*(idx+1), 40:40+40] = labels[y[0]]
     
