@@ -29,7 +29,8 @@ python demo.py -t feas
 ```bash
 # 1. Run following code for different part
 python solution/utils.py -l 6091 -c red
-# 2. Change the pose of part to collect more data.
+# 2. Change the pose of part to collect more data 
+# and press any key to quit collect process.
 ```
 
 ## How to use
