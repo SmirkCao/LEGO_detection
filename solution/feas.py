@@ -128,7 +128,15 @@ class FeaHuMoments(Feature):
 class FeaGoodFeatures(Feature):
     def extract(self, img, mask=None):
         contour = mask
-        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        rotated_rect = cv.minAreaRect(contour)
+        x, y = rotated_rect[0]
+        w, h = rotated_rect[1]
+        angle = rotated_rect[2]
+        rot_mat = cv.getRotationMatrix2D((x, y), angle, 1)
+        rot_img = cv.warpAffine(img, rot_mat, (img.shape[1], img.shape[0]))
+        # obj = rot_img[int(y) - int(h / 2):int(y) + int(h / 2), int(x) - int(w / 2):int(x) + int(w / 2)]
+        gray = cv.cvtColor(rot_img, cv.COLOR_BGR2GRAY)
+        
         corners = cv.goodFeaturesToTrack(gray, 500, 0.01, 15)
         return corners
     
