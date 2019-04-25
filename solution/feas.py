@@ -120,6 +120,21 @@ class FeaMinAreaRect(Feature):
 class FeaHuMoments(Feature):
     def extract(self, img, mask=None):
         pass
+    
+    def get_feature(self, img, mask=None):
+        pass
+    
+    
+class FeaGoodFeatures(Feature):
+    def extract(self, img, mask=None):
+        contour = mask
+        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        corners = cv.goodFeaturesToTrack(gray, 500, 0.01, 15)
+        return corners
+    
+    def get_feature(self, img, mask=None):
+        corners = self.extract(img, mask=mask)
+        return np.array([[corners.shape[0]]])
 
 
 class FeatureExtractor(object):

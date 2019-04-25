@@ -11,9 +11,10 @@ Raises:
 TODO: save to video
 """
 from segmentation import SegAdaThresh
-from feas import FeaColor, FeaPerimeter, FeaArea, FeaMinAreaRect, FeatureExtractor
+from feas import FeaColor, FeaPerimeter, FeaArea, FeaMinAreaRect, FeatureExtractor, FeaGoodFeatures
 from model import RF
 import cv2 as cv
+import numpy as np
 import logging
 import argparse
 import pickle
@@ -186,7 +187,35 @@ class ClassificationDemo(Demo):
             if k == ord("q"):
                 break
         cv.destroyAllWindows()
-        
+
+
+class GoodFeaturesDemo(Demo):
+    def show(self):
+        seg = SegAdaThresh()
+        fea = FeaGoodFeatures()
+        while True:
+            _, frame = self.cap.read()
+            rst, objs = seg.run(frame.copy())
+            areas = []
+            if "contours" in objs.keys():
+                contours = objs["contours"]
+                for idx, contour in enumerate(contours):
+                    corners = fea.extract(frame, contour)
+                    corners = np.int0(corners)
+                    for i in corners:
+                        x, y = i.ravel()
+                        cv.circle(frame, (x, y), 6, (255, 0, 0), -1)
+                    
+                    cv.putText(frame, "GoodFeas Count:#{0}".format(corners.shape[0]),
+                               (x, y),
+                               cv.FONT_HERSHEY_COMPLEX_SMALL, 1, COMMENT_COLOR)
+            
+            cv.imshow("GoodFeatureToTrackDemo", frame)
+            k = cv.waitKey(100)
+            if k == ord("q"):
+                break
+        cv.destroyAllWindows()
+
 
 format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(level=logging.INFO, format=format_str)
@@ -203,7 +232,8 @@ demo_map = {"feas": CircleFeatureDemo,
             "perimeter": PerimeterDemo,
             "area": AreaDemo,
             "min_area": MinAreaRectDemo,
-            "clf": ClassificationDemo}
+            "clf": ClassificationDemo,
+            "good_feas": GoodFeaturesDemo}
 
 if __name__ == '__main__':
     demo = demo_map[args["type"]](n_camera=int(args["camera_id"]))
